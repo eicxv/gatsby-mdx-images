@@ -94,7 +94,11 @@ module.exports = async (
   }
 
   async function mutateJsxNode(node) {
-    const $ = cheerio.load(node.value, { withStartIndices: true }, false);
+    const $ = cheerio.load(
+      node.value,
+      { xml: { withStartIndices: true } },
+      false
+    );
     const images = [];
     $(options.elementName).each(function () {
       images.push(this);

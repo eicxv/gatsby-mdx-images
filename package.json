@@ -1,0 +1,41 @@
+{
+  "name": "gatsby-mdx-images",
+  "version": "0.1.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/eicxv/gatsby-mdx-images.git"
+  },
+  "keywords": [
+    "gatsby",
+    "gatsby-plugin",
+    "gatsby-plugin-mdx",
+    "gatsby-plugin-sharp",
+    "mdx",
+    "sharp",
+    "image"
+  ],
+  "author": "Einar Persson",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/eicxv/gatsby-mdx-images/issues"
+  },
+  "homepage": "https://github.com/eicxv/gatsby-mdx-images#readme",
+  "peerDependencies": {
+    "gatsby-plugin-sharp": "^2"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.5",
+    "gatsby-core-utils": "^1.10.0",
+    "is-relative-url": "^3.0.0",
+    "mdast-util-definitions": "^4.0.0",
+    "unist-util-visit": "^2.0.3"
+  },
+  "engines": {
+    "node": ">=12.13.0"
+  }
+}

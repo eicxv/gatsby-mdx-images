@@ -80,7 +80,7 @@ module.exports = async (
     return fileNode;
   }
 
-  async function generateFluidResult(src, imgOptions = {}) {
+  async function generateFluidResult(src, imageOptions = {}) {
     const imageNode = getFileNode(src);
     if (!imageNode) {
       return null;
@@ -97,11 +97,11 @@ module.exports = async (
     }
     let fluidOptions = {
       ...options.fluid,
-      ...imgOptions.fluid,
+      ...imageOptions.fluid,
     };
     let outputOptions = {
       ...options.output,
-      ...imgOptions.output,
+      ...imageOptions.output,
     };
     let result = await fluid({
       file: imageNode,
@@ -151,12 +151,12 @@ module.exports = async (
 
     for (let img of images.reverse()) {
       const src = img.attribs.src;
-      let sharpOptions = {};
-      if (img.attribs.sharp) {
-        sharpOptions = JSON.parse(img.attribs.sharp);
+      let imageOptions = {};
+      if (img.attribs["image-options"]) {
+        imageOptions = JSON.parse(img.attribs["image-options"]);
       }
 
-      const fluidResult = await generateFluidResult(src, sharpOptions);
+      const fluidResult = await generateFluidResult(src, imageOptions);
       if (fluidResult) {
         let fluidAttr = ` fluid={${JSON.stringify(fluidResult)}} `;
         node.value = insert(

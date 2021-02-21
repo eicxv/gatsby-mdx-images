@@ -82,16 +82,6 @@ module.exports = async (
 
   async function generateFluidResult(src, imageOptions = {}) {
     const imageNode = getFileNode(src);
-    if (!imageNode) {
-      return null;
-    }
-    const pathname = new URL(imageNode.absolutePath).pathname;
-    const fileType = pathname.substring(pathname.lastIndexOf(".") + 1);
-    // Ignore gifs as we can't process them,
-    // svgs as they are already responsive by definition
-    if (!isRelativeUrl(src) || fileType === "gif" || fileType === "svg") {
-      return null;
-    }
     if (!imageNode || !imageNode.absolutePath) {
       return null;
     }

@@ -149,7 +149,7 @@ module.exports = async (
       images.push(this);
     });
 
-    for (let img of images) {
+    for (let img of images.reverse()) {
       const src = img.attribs.src;
       let sharpOptions = {};
       if (img.attribs.sharp) {

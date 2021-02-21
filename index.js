@@ -12,9 +12,15 @@ module.exports = async (
 ) => {
   const DEFAULT_OPTIONS = {
     elementName: "Img",
+    replaceMarkdownImageParent: true,
     fluid: {
       maxWidth: 800,
       quality: 80,
+    },
+    output: {
+      base64: true,
+      withWebp: false,
+      limitPresentationSize: false,
     },
   };
 
@@ -25,7 +31,17 @@ module.exports = async (
       ...DEFAULT_OPTIONS.fluid,
       ...pluginOptions.fluidOptions,
     },
+    output: {
+      ...DEFAULT_OPTIONS.output,
+      ...pluginOptions.outputOptions,
+    },
   };
+
+  function replaceMarkdownParent(node, parent) {
+    if (node.type !== "jsx") {
+      parent.type = "div";
+    }
+  }
 
   function getNodes(ast) {
     let nodes = {
@@ -33,8 +49,11 @@ module.exports = async (
       image: [],
       imageReference: [],
     };
-    visit(ast, Object.keys(nodes), (node) => {
+    visit(ast, Object.keys(nodes), (node, index, parent) => {
       nodes[node.type].push(node);
+      if (options.replaceMarkdownImageParent) {
+        replaceMarkdownParent(node, parent);
+      }
     });
     const definition = definitions(ast);
     nodes.imageReference.map((imgRef) => {
@@ -78,15 +97,41 @@ module.exports = async (
     }
     let fluidOptions = {
       ...options.fluid,
-      ...imgOptions,
+      ...imgOptions.fluid,
     };
-    let fluidResult = await fluid({
+    let outputOptions = {
+      ...options.output,
+      ...imgOptions.output,
+    };
+    let result = await fluid({
       file: imageNode,
       args: fluidOptions,
       reporter,
       cache,
     });
-    return fluidResult;
+
+    result = {
+      aspectRatio: result.aspectRatio,
+      sizes: result.sizes,
+      src: result.src,
+      srcSet: result.srcSet,
+      ...(outputOptions.base64 && { base64: result.base64 }),
+      ...(outputOptions.limitPresentationSize && {
+        maxHeight: result.presentationHeight,
+        maxWidth: result.presentationWidth,
+      }),
+    };
+    if (outputOptions.withWebp) {
+      let webpResult = await fluid({
+        file: imageNode,
+        args: { ...fluidOptions, toFormat: "WEBP" },
+        reporter,
+        cache,
+      });
+      result.srcWebp = webpResult.src;
+      result.srcSetWebp = webpResult.srcSet;
+    }
+    return result;
   }
 
   function insert(str, index, value) {
@@ -106,12 +151,12 @@ module.exports = async (
 
     for (let img of images) {
       const src = img.attribs.src;
-      let fluidOptions = {};
-      if (img.fluid) {
-        fluidOptions = JSON.parse(img.fluid);
+      let sharpOptions = {};
+      if (img.attribs.sharp) {
+        sharpOptions = JSON.parse(img.attribs.sharp);
       }
 
-      const fluidResult = await generateFluidResult(src, fluidOptions);
+      const fluidResult = await generateFluidResult(src, sharpOptions);
       if (fluidResult) {
         let fluidAttr = ` fluid={${JSON.stringify(fluidResult)}} `;
         node.value = insert(

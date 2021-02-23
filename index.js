@@ -29,11 +29,11 @@ module.exports = async (
     ...pluginOptions,
     fluid: {
       ...DEFAULT_OPTIONS.fluid,
-      ...pluginOptions.fluidOptions,
+      ...pluginOptions.fluid,
     },
     output: {
       ...DEFAULT_OPTIONS.output,
-      ...pluginOptions.outputOptions,
+      ...pluginOptions.output,
     },
   };
 
